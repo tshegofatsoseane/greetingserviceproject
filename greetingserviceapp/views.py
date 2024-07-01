@@ -68,7 +68,7 @@ def greet_visitor(request):
 
     response = {
         "client_ip": client_ip,
-        "location": f"{city}",
+        "location": f"{city}, {country}",
         "greeting": greeting
     }
     return JsonResponse(response, json_dumps_params={'indent': 4})
