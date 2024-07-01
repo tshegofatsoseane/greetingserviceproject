@@ -1,20 +1,21 @@
-from django.http import JsonResponse
-import requests 
-import os
+
 from dotenv import load_dotenv
+import requests 
+from django.http import JsonResponse
+import os
 
 load_dotenv()
 
 def get_location(ip):
     """
-    Fetch location of user IP address using ip-api.
+    get ip address
 
-    Args:
-    ip (str): The IP address of the client.
+    Args: ip(str) user IP address
 
-    Returns:
-    str: city matching the IP address or 'Unknown' if it's not found.
+    Return str(city) location ip address
+
     """
+
     try:
         response = requests.get(f'http://ip-api.com/json/{ip}')
         response.raise_for_status()
@@ -27,14 +28,14 @@ def get_location(ip):
     
 def get_temperature(city, country):
     """
-    Get the temp of the location using OpenWeather API
+    get location temparature
 
-    Args:
-    city (str): location to fetch the temp.
+    Args: city(str): location to fetch the temparature for
 
-    Returns:
-    float: The temp or None if not found.
+    Return: float: The location temparature, or None if not found
+
     """
+
     api_key = os.getenv('OPENWEATHER_API_KEY')
     if not api_key:
         return None
@@ -50,14 +51,15 @@ def get_temperature(city, country):
 
 def greet_visitor(request):
     """
-    Greet visitor by his/her name and show IP address, location, and temperature of location.
+    Greet the visitor by their name, and show their IP address, location and temparature of the city
 
-    Args:
-    request (HttpRequest): request object.
+    Args: request(HttpRequest): request object
 
-    Returns:
-    JsonResponse: The greeting, the IP address & location, and the temperature as json response.
+    Returns: JsonResponse: The greeting, consisting of a user's name, IP address, location and temparature of the city
     """
+    
+
+
     visitor_name = request.GET.get('visitor_name', 'Visitor')
     client_ip = get_client_ip(request)
     city, country = get_location(client_ip)
