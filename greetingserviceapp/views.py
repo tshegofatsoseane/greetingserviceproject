@@ -3,9 +3,11 @@ import requests
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
 def get_location(ip):
     """
-    fetch location of user IP address using ip-api.
+    Fetch location of user IP address using ip-api.
 
     Args:
     ip (str): The IP address of the client.
@@ -57,7 +59,7 @@ def greet_visitor(request):
     JsonResponse: The greeting, the IP address & location, and the temperature as json response.
     """
     visitor_name = request.GET.get('visitor_name', 'Visitor')
-    client_ip = request.META.get('REMOTE_ADDR', '0.0.0.0')  # default to '0.0.0.0' if the ip is not found
+    client_ip = get_client_ip(request)
     city, country = get_location(client_ip)
     temperature = get_temperature(city, country)
 
@@ -72,3 +74,20 @@ def greet_visitor(request):
         "greeting": greeting
     }
     return JsonResponse(response, json_dumps_params={'indent': 4})
+
+def get_client_ip(request):
+    """
+    get client IP from request, check for the X-Forwarded-For header.
+
+    Args:
+    request (HttpRequest): request object.
+
+    Returns:
+    str: The client's IP address.
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR', '0.0.0.0')
+    return ip
