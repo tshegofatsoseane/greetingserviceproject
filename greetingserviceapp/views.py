@@ -13,8 +13,8 @@ def greet_visitor(request):
     client_ip = request.META.get('REMOTE_ADDR')
     location = get_location(client_ip)
     response = {
-        "clientir": client_ip,
+        "client_ip": client_ip,
         "location": location,
         "greeting": f"Hello, {visitor_name}!"
     }
-    return JsonResponse(response)
+    return JsonResponse(response, json_dumps_params={'indent': 4})
