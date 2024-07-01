@@ -15,11 +15,15 @@ def get_location(ip):
     """
     try:
         response = requests.get(f'http://ip-api.com/json/{ip}')
-        return response.json().get('city', 'Unknown')
-    except:
-        return 'Unknown'
+        response.raise_for_status()
+        data = response.json()
+        city = data.get('city', 'Unknown')
+        country = data.get('country', 'Unknown')
+        return city, country
+    except requests.RequestException:
+        return 'Unknown', 'Unknown'
     
-def get_temperature(city):
+def get_temperature(city, country):
     """
     Get the temp of the location using OpenWeather API
 
@@ -30,8 +34,12 @@ def get_temperature(city):
     float: The temp or None if not found.
     """
     api_key = os.getenv('OPENWEATHER_API_KEY')
+    if not api_key:
+        return None
     try:
-        response = requests.get(f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric')
+        response = requests.get(
+            f'http://api.openweathermap.org/data/2.5/weather?q={city},{country}&appid={api_key}&units=metric'
+        )
         response.raise_for_status()
         weather_data = response.json()
         return weather_data['main'].get('temp')
@@ -49,18 +57,18 @@ def greet_visitor(request):
     JsonResponse: The greeting, the IP address & location, and the temperature as json response.
     """
     visitor_name = request.GET.get('visitor_name', 'Visitor')
-    client_ip = request.META.get('REMOTE_ADDR')
-    location = get_location(client_ip)
-    temperature = get_temperature(location)
+    client_ip = request.META.get('REMOTE_ADDR', '0.0.0.0')  # default to '0.0.0.0' if the ip is not found
+    city, country = get_location(client_ip)
+    temperature = get_temperature(city, country)
 
     if temperature is not None:
-        greeting = f"Hello, {visitor_name}!, the temperature is {temperature:.2f} degrees Celsius in {location}"
+        greeting = f"Hello, {visitor_name}! The temperature is {temperature:.2f} degrees Celsius in {city}."
     else:
         greeting = f"Hello, {visitor_name}!"
 
     response = {
         "client_ip": client_ip,
-        "location": location,
-        "greeting": f"Hello, {visitor_name}!"
+        "location": f"{city}",
+        "greeting": greeting
     }
     return JsonResponse(response, json_dumps_params={'indent': 4})
