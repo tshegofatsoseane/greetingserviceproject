@@ -17,7 +17,7 @@ def get_location(ip):
     """
 
     try:
-        response = requests.get(f'http://ip-api.com/json/{ip}')
+        response=requests.get(f'http://ip-api.com/json/{ip}')
         response.raise_for_status()
         data = response.json()
         city = data.get('city', 'Unknown')
@@ -35,8 +35,7 @@ def get_temperature(city, country):
     Return: float: The location temparature, or None if not found
 
     """
-
-    api_key = os.getenv('OPENWEATHER_API_KEY')
+    api_key=os.getenv('OPENWEATHER_API_KEY')
     if not api_key:
         return None
     try:
@@ -55,13 +54,10 @@ def greet_visitor(request):
 
     Args: request(HttpRequest): request object
 
-    Returns: JsonResponse: The greeting, consisting of a user's name, IP address, location and temparature of the city
+    Returns:JsonResponse: The greeting, consisting of a user's name, IP address, location and temparature of the city
     """
-    
-
-
-    visitor_name = request.GET.get('visitor_name', 'Visitor')
-    client_ip = get_client_ip(request)
+    visitor_name=request.GET.get('visitor_name', 'Visitor')
+    client_ip=get_client_ip(request)
     city, country = get_location(client_ip)
     temperature = get_temperature(city, country)
 
@@ -87,9 +83,9 @@ def get_client_ip(request):
     Returns:
     str: The client's IP address.
     """
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    x_forwarded_for=request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0].strip()
+        ip=x_forwarded_for.split(',')[0].strip()
     else:
-        ip = request.META.get('REMOTE_ADDR', '0.0.0.0')
+        ip=request.META.get('REMOTE_ADDR', '0.0.0.0')
     return ip
