@@ -11,5 +11,5 @@ This Django project offers a basic web service that shows visitors' location and
 
 1. **Clone the Repository:**
    ```bash
-   git clone [https://your-repository-url](https://github.com/tshegofatsoseane/greetingserviceproject.git)
+   git clone (https://github.com/tshegofatsoseane/greetingserviceproject.git)
    cd greetingservice
